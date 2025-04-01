@@ -10,8 +10,8 @@ import requests
 app = Flask(__name__)
 
 # Telegram Bot credentials
-BOT_TOKEN = "7711660742:AAH1PQVgSchFU1KBg31rougVhLxa-A3x5iw"
-CHAT_ID = "8187506119"
+BOT_TOKEN = //input your token
+CHAT_ID = "//Input your chat id
 
 # HTML template for live log page
 html_template = """
