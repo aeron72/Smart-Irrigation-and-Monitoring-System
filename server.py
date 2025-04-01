@@ -5,10 +5,15 @@ import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 import io
+import requests
 
 app = Flask(__name__)
 
-# HTML template with live graph link
+# Telegram Bot credentials
+BOT_TOKEN = "7711660742:AAH1PQVgSchFU1KBg31rougVhLxa-A3x5iw"
+CHAT_ID = "8187506119"
+
+# HTML template for live log page
 html_template = """
 <!DOCTYPE html>
 <html lang="en">
@@ -43,21 +48,35 @@ html_template = """
 </html>
 """
 
-# Stores rolling logs
+# Rolling log buffer
 log_buffer = []
 
+# Send Telegram alert if soil is dry
+def send_telegram_alert(moisture, timestamp):
+    message = f"🚨 Soil is dry! Moisture = {moisture}% at {timestamp}"
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {"chat_id": CHAT_ID, "text": message}
+    try:
+        response = requests.post(url, data=payload)
+        print("Telegram alert sent:", response.json())
+    except Exception as e:
+        print("Failed to send Telegram alert:", e)
+
+# Root route: render HTML log dashboard
 @app.route("/", methods=["GET"])
 def index():
     return render_template_string(html_template, logs=log_buffer)
 
+# Route to receive ESP32 sensor updates
 @app.route("/update", methods=["GET"])
 def update_data():
     try:
-        moisture = request.args.get("moisture")           # in %
-        capacitance = request.args.get("capacitance")     # raw ADC
-        soil_temp = request.args.get("soil_temp")         # °F
-        air_temp = request.args.get("air_temp")           # °F
-        humidity = request.args.get("humidity")           # %
+        # Get query params
+        moisture = request.args.get("moisture")
+        capacitance = request.args.get("capacitance")
+        soil_temp = request.args.get("soil_temp")
+        air_temp = request.args.get("air_temp")
+        humidity = request.args.get("humidity")
 
         if None in [moisture, capacitance, soil_temp, air_temp, humidity]:
             return "Missing one or more parameters", 400
@@ -66,21 +85,26 @@ def update_data():
         log = (f"[{timestamp}] Moisture: {moisture}%, Capacitance: {capacitance}, "
                f"Soil Temp: {soil_temp}°F, Air Temp: {air_temp}°F, Humidity: {humidity}%")
 
+        # Update rolling buffer
         if len(log_buffer) >= 20:
             log_buffer.pop(0)
         log_buffer.append(log)
-
         print(log)
 
-        # Save to CSV for graphing
+        # Save to CSV
         with open("sensor_log.csv", "a") as file:
             file.write(f"{timestamp},{moisture},{capacitance},{soil_temp},{air_temp},{humidity}\n")
+
+        # Trigger Telegram alert if soil is too dry
+        if int(moisture) < 30:
+            send_telegram_alert(moisture, timestamp)
 
         return "Data received", 200
 
     except Exception as e:
         return str(e), 500
 
+# Moisture graph route
 @app.route("/moisture_plot")
 def moisture_plot():
     try:
@@ -105,7 +129,7 @@ def moisture_plot():
     except Exception as e:
         return f"Error generating plot: {str(e)}"
 
-# Optional: print latest log to terminal every 10 seconds
+# Optional: terminal log every 10 seconds
 def auto_logger():
     while True:
         time.sleep(10)
