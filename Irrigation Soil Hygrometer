@@ -1,0 +1,157 @@
+#include <Arduino.h>
+#include <TFT_eSPI.h>          // Library for TFT screen
+#include <WiFi.h>              // Wi-Fi connectivity
+#include <WebServer.h>         // Web server for debugging (not actively used here)
+#include <DFRobot_DHT20.h>     // Library for DHT20 sensor (I2C temp + humidity)
+#include <OneWire.h>           // For DS18B20 soil temp sensor
+#include <DallasTemperature.h> // High-level library for OneWire temperature sensors
+#include <HTTPClient.h>        // HTTP client to send data to EC2 server
+
+// GPIO pins
+#define TEMP_PIN  32      // GPIO for DS18B20 soil thermometer (OneWire)
+#define SENSOR_PIN 33     // GPIO for soil moisture sensor (analog)
+#define THRMSTR_PIN 21    // I2C pin (SDA) for DHT20
+
+// Moisture threshold values (analogRead)
+const int dry_soil = 2100;
+const int wet_soil = 1500;
+const int threshold = 2100;  // When above this, soil is considered dry
+
+// Wi-Fi credentials
+const char* ssid = "Yellowsycamore";
+const char* password = "HApFFeDLgb";
+
+// Pump ESP32 IP and port
+const char* pumpAddress = "192.168.1.136";  // ESP32 controlling pump
+const int pumpPort = 4080;
+
+// AWS EC2 server URL for uploading sensor data
+const char* awsURL = "http://18.212.5.0:5000/update";
+
+// TFT screen setup
+TFT_eSPI tft = TFT_eSPI();       // TFT display instance
+WiFiClient TCPclient;            // TCP client for sending commands to pump
+OneWire oneWire(TEMP_PIN);       // OneWire bus on TEMP_PIN
+DallasTemperature sensors(&oneWire);  // DS18B20 sensor
+DFRobot_DHT20 dht20;             // DHT20 air temp + humidity sensor
+
+// Function to send sensor data to AWS server
+void sendToAWS(int moisture, int capacitance, float soil_temp, float air_temp, float humidity) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    String url = String(awsURL) +
+      "?moisture=" + String(moisture) +
+      "&capacitance=" + String(capacitance) +
+      "&soil_temp=" + String(soil_temp, 2) +
+      "&air_temp=" + String(air_temp, 2) +
+      "&humidity=" + String(humidity, 1);
+
+    http.begin(url);
+    int code = http.GET();  // Send GET request to server
+    Serial.print("AWS HTTP Response: ");
+    Serial.println(code);
+    http.end();
+  } else {
+    Serial.println("WiFi not connected — skipping AWS update.");
+  }
+}
+
+void setup() {
+  Serial.begin(115200);  // Start serial communication for debugging
+
+  // Connect to Wi-Fi
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WIFI...");
+  }
+
+  sensors.begin();  // Start soil temperature sensor
+
+  // Attempt TCP connection to pump controller
+  if (TCPclient.connect(pumpAddress, pumpPort)) {
+    Serial.println("Connected to pump ESP32");
+  } else {
+    Serial.println("Failed to connect to pump ESP32");
+  }
+
+  pinMode(SENSOR_PIN, OUTPUT);  // Setup soil sensor pin
+
+  // Initialize TFT display
+  tft.init();
+  tft.setRotation(1);
+  tft.fillScreen(TFT_BLACK);
+}
+
+void loop() {
+  // Reconnect if TCP connection is lost
+  if (!TCPclient.connected()) {
+    Serial.println("Pump TCP connection lost");
+    TCPclient.stop();
+    if (TCPclient.connect(pumpAddress, pumpPort)) {
+      Serial.println("Reconnected to pump");
+    } else {
+      Serial.println("Failed to reconnect to pump");
+    }
+  }
+
+  // Read soil moisture
+  int sensorValue = analogRead(SENSOR_PIN);
+  int percent = map(sensorValue, dry_soil, wet_soil, 0, 100); // Convert raw value to percentage
+  percent = constrain(percent, 0, 100); // Bound between 0-100%
+
+  // Control pump based on moisture
+  if (sensorValue > threshold) {
+    TCPclient.write("1");  // Send '1' to turn pump ON
+    TCPclient.flush();
+    Serial.println("Pump ON signal sent");
+    tft.setTextColor(TFT_CYAN, TFT_BLACK);
+    tft.drawString("PUMP ON", 60, 80, 4);
+  } else {
+    TCPclient.write("0");  // Send '0' to turn pump OFF
+    TCPclient.flush();
+    tft.setTextColor(TFT_BLACK, TFT_BLACK);
+    tft.drawString("PUMP ON", 60, 80, 4);
+  }
+
+  // Read soil temperature
+  sensors.requestTemperatures();
+  float soilTempF = sensors.getTempFByIndex(0);
+
+  // Initialize and read DHT20 for air temp & humidity
+  while (dht20.begin()) {
+    Serial.println("Failed to initialize DHT20 sensor!");
+    delay(1000);
+  }
+  float airTempF = dht20.getTemperature() * 1.8 + 32; // Convert to Fahrenheit
+  float humidity = dht20.getHumidity() * 100.0;
+
+  // Print to serial for debugging
+  Serial.println("----- SENSOR DATA -----");
+  Serial.print("Moisture sensor (ADC): ");
+  Serial.println(sensorValue);
+  Serial.print("Moisture percent: ");
+  Serial.print(percent);
+  Serial.println(" %");
+  Serial.print("Soil Temp: ");
+  Serial.print(soilTempF);
+  Serial.println(" °F");
+  Serial.print("Air Temp: ");
+  Serial.print(airTempF);
+  Serial.println(" °F");
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" %");
+
+  // Display sensor values on TFT screen
+  tft.setTextColor(TFT_GREEN, TFT_BLACK);
+  tft.drawString("Moisture", 60, 10, 4);
+  tft.setTextColor(TFT_YELLOW, TFT_BLACK);
+  tft.drawString(String(sensorValue) + " f", 30, 50, 4);
+  tft.drawString(String(percent) + " %", 120, 50, 4);
+
+  // Send sensor data to EC2 Flask server
+  sendToAWS(percent, sensorValue, soilTempF, airTempF, humidity);
+
+  delay(6000);  // Wait 6 seconds before repeating
+}
