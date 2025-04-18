@@ -142,13 +142,7 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 
 ---
 
-## 📸 Optional Screenshots (add to GitHub)
 
-- Live logs page  
-- Moisture graph  
-- ESP32 web dashboard  
-
----
 
 ## 🧪 Future Improvements
 
@@ -159,11 +153,6 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 
 ---
 
-## 📜 License
-
-MIT License. Feel free to use, modify, or share with attribution.
-
----
 
 ## ✨ Created by Aeron Flores
 
