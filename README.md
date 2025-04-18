@@ -15,6 +15,8 @@ Hygrometer and Sensors
 ![hygro2](https://github.com/user-attachments/assets/782e6ab5-b352-4920-a1ba-7a925fd1318b)
 
 
+My Smart Irrigation and Monitoring System is an IoT-based solution designed to automate and remotely monitor agricultural irrigation using ESP32 microcontrollers. It continuously tracks soil moisture, soil temperature, air temperature, and humidity using multiple sensors. When the soil is too dry, it automatically activates a water pump through a TCP connection between two ESP32s. All data is sent to a cloud-based Flask server running on AWS EC2, where it's logged, visualized in real time, and monitored via a live web dashboard. The system also sends instant Telegram alerts when critical conditions are detected, ensuring timely and efficient irrigation management.
+
 ---
 
 ## 🔧 Hardware Used
