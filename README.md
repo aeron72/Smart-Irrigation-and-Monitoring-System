@@ -143,7 +143,12 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 - Telegram bot sends alerts when moisture drops below threshold.
 
 ---
+## Architecture
 
+<img width="714" alt="image" src="https://github.com/user-attachments/assets/65dfdb7d-fbbc-40d5-8b36-769d2142d6bd" />
+
+
+---
 
 
 ## 🧪 Future Improvements
