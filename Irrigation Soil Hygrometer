@@ -18,8 +18,8 @@ const int wet_soil = 1500;
 const int threshold = 2100;  // When above this, soil is considered dry
 
 // Wi-Fi credentials
-const char* ssid = "Yellowsycamore";
-const char* password = "HApFFeDLgb";
+const char* ssid = "WifiName";
+const char* password = "WifiPassword";
 
 // Pump ESP32 IP and port
 const char* pumpAddress = "192.168.1.136";  // ESP32 controlling pump
