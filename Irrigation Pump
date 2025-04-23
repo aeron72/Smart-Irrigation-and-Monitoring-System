@@ -5,8 +5,8 @@
 #include <TFT_eSPI.h>
 
 // Replace with your network credentials
-const char* ssid = "Yellowsycamore";
-const char* password = "HApFFeDLgb";
+const char* ssid = "WifiName";
+const char* password = "WifiPassword";
 
 const char* PARAM_INPUT_1 = "output";
 const char* PARAM_INPUT_2 = "state";
