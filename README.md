@@ -5,6 +5,9 @@ Members: Aeron Flores
 **Final Report Document Link:**
 https://docs.google.com/document/d/1uENo80Rl8ItnuAQgzOpnZWEjE1_HJCSt/edit?usp=sharing&ouid=100286687965086254125&rtpof=true&sd=true
 
+[Template_Project_Final_Report_CS596.docx.pdf](https://github.com/user-attachments/files/19952225/Template_Project_Final_Report_CS596.docx.pdf)
+
+
 **Video Demo Link:**
 https://youtu.be/ns965L80Z3c
 
