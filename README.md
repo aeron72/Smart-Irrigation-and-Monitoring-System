@@ -164,7 +164,6 @@ AWS stores data for moisture over time. AWS also gives sensor data based on the 
 ## 🧪 Future Improvements
 
 - Add OTA update support
-- Deploy live AWS web dashboard using Flask + JS
 - Integrate power monitoring
 - Add water level detection
 
