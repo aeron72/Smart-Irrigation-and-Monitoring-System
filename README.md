@@ -158,6 +158,7 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 ## Data Analytics
 <img width="748" alt="image" src="https://github.com/user-attachments/assets/fcd44105-ecf6-4801-bedf-339a43e48ef6" />
 AWS stores data for moisture over time.
+
 <img width="244" alt="image" src="https://github.com/user-attachments/assets/ce64bee0-052e-4379-b67b-a8d948213c46" />
 AWS also displays sensors based on current time.
 ---
