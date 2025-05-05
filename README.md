@@ -160,6 +160,7 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 AWS stores data for moisture over time.
 
 
+
 <img width="244" alt="image" src="https://github.com/user-attachments/assets/ce64bee0-052e-4379-b67b-a8d948213c46" />
 
 AWS also gives sensor data based on current time.
