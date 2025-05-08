@@ -25,7 +25,7 @@ My Smart Irrigation and Monitoring System is an IoT-based solution designed to a
 
 ---
 
-## 🔧 Hardware Used
+## Hardware Used
 
 - 2x **ESP32 Dev Boards**
 - 1x **Capacitive Soil Moisture Sensor**
@@ -38,7 +38,7 @@ My Smart Irrigation and Monitoring System is an IoT-based solution designed to a
 
 ---
 
-## 🔌 Wiring Overview
+## Wiring Overview
 
 ### ESP32 Sensor Node
 | GPIO | Component                     |
@@ -57,7 +57,7 @@ My Smart Irrigation and Monitoring System is an IoT-based solution designed to a
 
 ---
 
-## 📦 Software Stack
+## Software Stack
 
 ### ESP32 Firmware
 - **Framework**: Arduino via PlatformIO
@@ -78,9 +78,9 @@ My Smart Irrigation and Monitoring System is an IoT-based solution designed to a
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
-### 🖥 EC2 Server (Flask)
+### EC2 Server (Flask)
 1. Install dependencies:
     ```bash
     pip install flask pandas matplotlib requests
@@ -94,12 +94,12 @@ My Smart Irrigation and Monitoring System is an IoT-based solution designed to a
     http://<your-ec2-ip>:5000
     ```
 
-### 📲 Telegram Bot Setup
+### Telegram Bot Setup
 1. Talk to [@BotFather](https://t.me/BotFather) and create a bot.
 2. Replace `BOT_TOKEN` and `CHAT_ID` in `server.py`.
 3. The server will send a notification when moisture < 30%.
 
-### 🔧 ESP32 Code Upload
+### ESP32 Code Upload
 Use [PlatformIO](https://platformio.org/) to upload code to each board.
 
 - Sensor ESP32:
@@ -129,7 +129,7 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 
 ---
 
-## 🌐 Web Interface
+## Web Interface
 
 ### EC2 Dashboard
 - Live log of sensor data
@@ -142,7 +142,7 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 
 ---
 
-## 📊 Data & Alerts
+## Data & Alerts
 
 - All sensor readings are logged in `sensor_log.csv`.
 - Access real-time soil moisture graph at `/moisture_plot`.
@@ -161,7 +161,7 @@ Use [PlatformIO](https://platformio.org/) to upload code to each board.
 AWS stores data for moisture over time. AWS also gives sensor data based on the current time.
 
 ---
-## 🧪 Future Improvements
+## Future Improvements
 
 - Add OTA update support
 - Integrate power monitoring
