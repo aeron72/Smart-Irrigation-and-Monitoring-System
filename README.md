@@ -170,5 +170,5 @@ AWS stores data for moisture over time. AWS also gives sensor data based on the 
 ---
 
 
-## ✨ Created by Aeron Flores
+## Created by Aeron Flores
 
